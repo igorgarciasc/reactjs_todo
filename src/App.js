@@ -1,10 +1,13 @@
+import React from 'react'
+import {Container} from 'react-bootstrap'
 
+import Tarefas from './Components/Tarefas'
 
 function App() {
   return (
-    <div className="App">
-      
-    </div>
+      <Container>
+        <Tarefas />
+      </Container>
   );
 }
 
