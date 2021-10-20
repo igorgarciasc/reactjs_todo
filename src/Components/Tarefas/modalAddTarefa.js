@@ -12,6 +12,7 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
         titulo: '',
         descricao: '',
         prioridade: 0,
+        situacao:1,
         pessoa: 0
     }
 
@@ -22,14 +23,15 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
     }
 
     function resolveRequest(result){
+        console.log(result)
             clearForm(); 
-            closeModal(false)
+            closeModal()
             realoadTarefas();
             alert(result.data.messages.success)
     }
 
     function handleClose() {
-        closeModal(false);
+        closeModal();
         clearForm();
     }
 
@@ -46,13 +48,15 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
             axios.post(process.env.REACT_APP_API_URL+'tarefa',params).then(result=>{
                 resolveRequest(result)
             }).catch(error => {
-                alert(error.response.data.messages.error);
+                alert('Ops, aconteceu algum problema. Consulte o Log para maiores informações')
+                console.log(error.response.data.messages.error);
             })
         }else{
+            params.append('situacao', tarefa.situacao);
             axios.put(process.env.REACT_APP_API_URL+'tarefa/'+tarefa.ido,params).then(result=>{
                 resolveRequest(result)
             }).catch(error => {
-                alert(error.response.data.messages.error);
+                alert('Ops, aconteceu algum problema.\n'+ error.response.data.messages.error)
             })
         }
     }
@@ -70,7 +74,6 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
 
     useEffect(()=>{
         if(tarefaSelecionada){
-            console.log(tarefaSelecionada)
             setTarefa(tarefaSelecionada)
         }
     },[tarefaSelecionada])
@@ -118,8 +121,7 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
                         <Label>Usuário</Label>
                         <Input
                             type="select"
-                            value={tarefa.pessoa}
-                            defaultValue={0}
+                            value={tarefa.pessoa==null?0:tarefa.pessoa}
                             onChange={(e)=>setTarefa({...tarefa,pessoa:e.target.value})}
                         >
                             <option value="0" >Selecione</option>
@@ -127,6 +129,23 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
                             <option value="2">Ciclano de Tal</option>
                         </Input>
                     </FormGroup>
+                    {
+                        tarefa.ido && (
+                            <FormGroup className="mb-3">
+                                <Label>Situação</Label>
+                                <Input
+                                    type="select"
+                                    value={tarefa.situacao}
+                                    onChange={(e)=>setTarefa({...tarefa,situacao:e.target.value})}
+                                >
+                                    <option value="0" disabled>Selecione</option>
+                                    <option value="1">Pendente</option>
+                                    <option value="2">Em Andamento</option>
+                                    <option value="3">Concluída</option>
+                                </Input>
+                            </FormGroup>
+                        )
+                    }
             </Modal.Body>
             <Modal.Footer>
                 {
