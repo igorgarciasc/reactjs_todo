@@ -129,8 +129,8 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
                             onChange={(e)=>setTarefa({...tarefa,pessoa:e.target.value})}
                         >
                             <option value="0" >Selecione</option>
-                            <option value="1">Fulano de Tal</option>
-                            <option value="2">Ciclano de Tal</option>
+                            <option value="1">Francisco Igor Garcia</option>
+                            <option value="2">Pessoa 2</option>
                         </Input>
                     </FormGroup>
                     {
