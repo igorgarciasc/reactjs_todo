@@ -1,5 +1,5 @@
 import React,{useState, useEffect} from 'react';
-import { Modal, Button, Form, } from 'react-bootstrap';
+import { Modal, Button, Form, Spinner, } from 'react-bootstrap';
 import { Input,FormGroup, Label } from 'reactstrap';
 import axios from 'axios';
 
@@ -15,7 +15,8 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
         situacao:1,
         pessoa: 0
     }
-
+    
+    const [isLoading, setLoading] = useState(false);
     const [tarefa, setTarefa] = useState(initialState);
     
     function clearForm(){
@@ -23,10 +24,10 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
     }
 
     function resolveRequest(result){
-        console.log(result)
             clearForm(); 
             closeModal()
             realoadTarefas();
+            setLoading(false);
             alert(result.data.messages.success)
     }
 
@@ -37,6 +38,7 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
 
     function handleSubmit(e) {
         e.preventDefault();
+        setLoading(true);
 
         const params = new URLSearchParams();
         params.append('titulo', tarefa.titulo);
@@ -48,8 +50,8 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
             axios.post(process.env.REACT_APP_API_URL+'tarefa',params).then(result=>{
                 resolveRequest(result)
             }).catch(error => {
-                alert('Ops, aconteceu algum problema. Consulte o Log para maiores informações')
-                console.log(error.response.data.messages.error);
+                alert('Ops, aconteceu algum problema.\n'+ error.response.data.messages.error)
+                setLoading(false);
             })
         }else{
             params.append('situacao', tarefa.situacao);
@@ -57,6 +59,7 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
                 resolveRequest(result)
             }).catch(error => {
                 alert('Ops, aconteceu algum problema.\n'+ error.response.data.messages.error)
+                setLoading(false);
             })
         }
     }
@@ -64,6 +67,7 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
     function handleDeleteTarefa(){
         let decisao = window.confirm('Você está certo disso?');
         if(decisao){
+            setLoading(true);
             axios.delete(process.env.REACT_APP_API_URL+'tarefa/'+tarefa.ido).then(result=>{
                 resolveRequest(result)
             })
@@ -151,14 +155,32 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
                 {
                     tarefa.ido && (
                         <>
-                             <Button variant="secondary" onClick={handleClose}>
+                             <Button variant="secondary" onClick={handleClose} disabled={isLoading}>
                                 Fechar
                             </Button>
-                            <Button variant="danger" onClick={handleDeleteTarefa}>
-                                Deletar
+                            <Button variant="danger" onClick={handleDeleteTarefa} disabled={isLoading}>
+                                {
+                                    isLoading && (
+                                        <Spinner animation="border" size="sm" />
+                                    )
+                                }
+                                {
+                                    !isLoading && (
+                                        <span>Deletar</span>
+                                    )
+                                }
                             </Button>
-                            <Button variant="primary" type="submit">
-                                Salvar
+                            <Button variant="primary" type="submit" disabled={isLoading}>
+                                {   
+                                    isLoading && (
+                                        <Spinner animation="border" size="sm" />
+                                    )
+                                }
+                                {
+                                    !isLoading && (
+                                        <span>Salvar</span>
+                                    )
+                                }
                             </Button>
                         </>
                     )
@@ -166,11 +188,20 @@ function ModalAddTarefa({show, closeModal, tarefaSelecionada, realoadTarefas}) {
                 {
                     !tarefa.ido && (
                         <>
-                             <Button variant="secondary" onClick={handleClose}>
+                             <Button variant="secondary" onClick={handleClose} disabled={isLoading}>
                                 Fechar
                             </Button>
-                            <Button variant="success" type="submit">
-                                Adicionar
+                            <Button variant="success" type="submit" disabled={isLoading}> 
+                                {
+                                    isLoading && (
+                                        <Spinner animation="border" size="sm" />
+                                    )
+                                }
+                                {
+                                    !isLoading && (
+                                        <span>Adicionar</span>
+                                    )
+                                }
                             </Button>
                         </>
                     )
